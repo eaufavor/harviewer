@@ -180,6 +180,9 @@ RequestList.prototype = domplate(
                         DIV({"class": "netSendingBar netBar"}),
                         DIV({"class": "netWaitingBar netBar"}),
                         DIV({"class": "netReceivingBar netBar"},
+                            FOR("data", "$files.dataArrivals",
+                                DIV({"class": "netDataReceivedDot netBar"})
+                                ),
                             SPAN({"class": "netTimeLabel"}, "$file|getElapsedTime")
                         )
                         // Page timings (vertical lines) are dynamically appended here.
@@ -251,7 +254,7 @@ RequestList.prototype = domplate(
 
     isFromCache: function(file)
     {
-        return file.cache && file.cache.afterRequest;
+        return file.cache && file.cache.beforeRequest;
     },
 
     getHref: function(file)
@@ -608,6 +611,12 @@ RequestList.prototype = domplate(
         this.barSendingWidth = ((sending/this.phaseElapsed) * 100).toFixed(3);
         this.barWaitingWidth = ((waiting/this.phaseElapsed) * 100).toFixed(3);
         this.barReceivingWidth = ((receiving/this.phaseElapsed) * 100).toFixed(3);
+        this.dataArrivalLeft = [];
+        var dataArrivalsLength = file.timing.dataArrivals.length;
+        for (var i = 0; i < dataArrivalsLength; i++ ) {
+            //relative percentage of the length of barReceiving
+            this.dataArrivalLeft[i] = ((this.timing.dataArrivals[i].timestamp/this.phaseElapsed) * this.barReceivingWidth).toFixed(3);
+        }
 
         // Compute also offset for page timings, e.g.: contentLoadBar and windowLoadBar,
         // which are displayed for the first phase. This is done only if a page exists.
@@ -674,6 +683,11 @@ RequestList.prototype = domplate(
             var sendingBar = connectingBar.nextSibling;
             var waitingBar = sendingBar.nextSibling;
             var receivingBar = waitingBar.nextSibling;
+            var dataDotDIVs = []
+            var dotLength = this.dataArrivalLeft.length;
+            for ( var i = 0; i < dotLength; i++ ) {
+                dataDotDIVs[i] = receivingBar.children[i];
+            }
 
             // All bars starts at the beginning of the appropriate request graph. 
             blockingBar.style.left = 
@@ -690,6 +704,9 @@ RequestList.prototype = domplate(
             sendingBar.style.width = this.barSendingWidth + "%";
             waitingBar.style.width = this.barWaitingWidth + "%";
             receivingBar.style.width = this.barReceivingWidth + "%";
+            for ( var i = 0; i < dotLength; i++ ) {
+                dataDotDIVs[i].style.left = this.dataArrivalLeft[i] + "%";
+            }
 
             // Remove all existing timing bars first. The UI can be relayouting at this moment
             // (can happen if break layout is executed).

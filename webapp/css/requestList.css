@@ -226,6 +226,18 @@
     height: 16px;
 }
 
+.netDataReceivedDot {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    background: #FF0000;
+    min-width: 0px;
+    z-index: 21;
+    height: 4px;
+    width: 4px;
+}
+
 .fromCache .netReceivingBar,
 .fromCache.netReceivingBar {
     background: url(images/timeline-sprites.png) repeat-x scroll 0 -96px #D6D6D6;

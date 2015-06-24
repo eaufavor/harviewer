@@ -230,11 +230,24 @@ var cacheEntryType = {
         "optional": true,
         "description": "Info about cache entry.",
         "properties": {
-            "expires": {"type": "string", optional: "true"},
+            "expires": {"type": "string", "optional": true},
             "lastAccess": {"type": "string"},
             "eTag": {"type": "string"},
             "hitCount": {"type": "integer"},
             "comment": {"type": "string", "optional": true}
+        }
+    }
+};
+
+var dataEntryType = {
+    "dataEntryType": {
+        "id": "dataEntryType",
+        "optional": true,
+        "description": "Info about data received.",
+        "properties": {
+            "timestamp": {"type": "number"},
+            "dataLength": {"type": "integer", "optional": true},
+            "encodedDataLength": {"type": "integer", "optional": true}
         }
     }
 };
@@ -251,11 +264,11 @@ var timingsType = {
             "wait": {"type": "number", "min": -1},
             "receive": {"type": "number", "min": -1},
             "ssl": {"type": "number", "optional": true, "min": -1},
+            "dataArrivals": {"type": "array", "optional": true, "items": {"$ref": "dataEntryType"}},
             "comment": {"type": "string", "optional": true}
         }
     }
 };
-
 // ************************************************************************************************
 // Helper schema object
 
@@ -297,6 +310,7 @@ schema.registerType(
     contentType,
     cacheType,
     cacheEntryType,
+    dataEntryType,
     timingsType
 );
 
