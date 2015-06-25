@@ -23,6 +23,7 @@ define(
         "request.phase.Sending": "Sending",
         "request.phase.Waiting": "Waiting",
         "request.phase.Receiving": "Receiving",
+        "request.phase.dataArrivals": "Data packet arrival",
 
         "request.timings.label": "Event timing relative to the request start:",
         "ContentLoad": "DOM Loaded",

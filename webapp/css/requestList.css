@@ -226,7 +226,7 @@
     height: 16px;
 }
 
-.netDataReceivedDot {
+.netDataArrivalBar {
     position: absolute;
     left: 0;
     top: 0;

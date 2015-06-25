@@ -181,7 +181,7 @@ RequestList.prototype = domplate(
                         DIV({"class": "netWaitingBar netBar"}),
                         DIV({"class": "netReceivingBar netBar"},
                             FOR("data", "$file|getDataArrivals",
-                                DIV({"class": "netDataReceivedDot netBar"})
+                                DIV({"class": "netDataArrivalBar netBar"})
                                 ),
                             SPAN({"class": "netTimeLabel"}, "$file|getElapsedTime")
                         )
@@ -1173,6 +1173,7 @@ var EntryTimeInfoTip = domplate(
         var send = file.timings.send;
         var wait = file.timings.wait;
         var receive = file.timings.receive;
+        var dataArrivals = file.timings.dataArrivals;
 
         if (blocked >= 0)
         {
@@ -1215,6 +1216,17 @@ var EntryTimeInfoTip = domplate(
                 elapsed: receive,
                 start: startTime += (wait < 0) ? 0 : wait,
                 loaded: file.loaded, fromCache: file.fromCache});
+        }
+
+        if ( 'undefined' !== typeof dataArrivals )
+        {
+            var dataArrivalsLength = dataArrivals.length;
+            for ( var i = 0; i < dataArrivalsLength; i++ ) {
+                timings.push({bar: "request.phase.dataArrivals",
+                elapsed: 0,
+                start: dataArrivals[i].timestamp,
+                loaded: dataArrivals[i].timestamp});
+            }
         }
 
         // Insert request timing info.
