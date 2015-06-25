@@ -180,7 +180,7 @@ RequestList.prototype = domplate(
                         DIV({"class": "netSendingBar netBar"}),
                         DIV({"class": "netWaitingBar netBar"}),
                         DIV({"class": "netReceivingBar netBar"},
-                            FOR("data", "$files.dataArrivals",
+                            FOR("data", "$file|getDataArrivals",
                                 DIV({"class": "netDataReceivedDot netBar"})
                                 ),
                             SPAN({"class": "netTimeLabel"}, "$file|getElapsedTime")
@@ -291,6 +291,14 @@ RequestList.prototype = domplate(
             file.response.content.size;
 
         return this.formatSize(size);
+    },
+
+    getDataArrivals: function(file)
+    {
+		if ( 'undefined' !== typeof file.timings.dataArrivals ) {
+			return file.timings.dataArrivals;
+		}
+        return [];
     },
 
     isExpandable: function(file)
@@ -490,6 +498,9 @@ RequestList.prototype = domplate(
         for (var i=0; i<requests.length; i++)
         {
             var file = requests[i];
+			if (typeof file.timings.dataArrivals === 'undefined') {
+				file.timings.dataArrivals = [];
+			}
 
             if (Lib.hasClass(row, "netInfoRow"))
                 row = row.nextSibling;
@@ -612,10 +623,10 @@ RequestList.prototype = domplate(
         this.barWaitingWidth = ((waiting/this.phaseElapsed) * 100).toFixed(3);
         this.barReceivingWidth = ((receiving/this.phaseElapsed) * 100).toFixed(3);
         this.dataArrivalLeft = [];
-        var dataArrivalsLength = file.timing.dataArrivals.length;
+        var dataArrivalsLength = file.timings.dataArrivals.length;
         for (var i = 0; i < dataArrivalsLength; i++ ) {
-            //relative percentage of the length of barReceiving
-            this.dataArrivalLeft[i] = ((this.timing.dataArrivals[i].timestamp/this.phaseElapsed) * this.barReceivingWidth).toFixed(3);
+            //relative percentage of the length of barReceiving, as Receiving Bar is the last one
+            this.dataArrivalLeft[i] = ((file.timings.dataArrivals[i].timestamp/this.phaseElapsed) *10000 / this.barReceivingWidth ).toFixed(3);
         }
 
         // Compute also offset for page timings, e.g.: contentLoadBar and windowLoadBar,
