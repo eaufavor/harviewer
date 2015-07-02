@@ -222,7 +222,7 @@
     bottom: 0;
     background: url(images/timeline-sprites.png) repeat-x scroll 0 -80px #B6B6B6;
     min-width: 0px;
-    z-index: 20;
+    /*z-index: 20;*/
     height: 16px;
 }
 
@@ -233,7 +233,7 @@
     bottom: 0;
     background: #FF0000;
     min-width: 0px;
-    z-index: 21;
+    z-index: 31;
     height: 4px;
     width: 4px;
 }
