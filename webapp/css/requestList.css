@@ -235,7 +235,8 @@
     min-width: 0px;
     z-index: 31;
     height: 4px;
-    width: 4px;
+    width: 3px;
+    opacity: 0.1;
 }
 
 .fromCache .netReceivingBar,
