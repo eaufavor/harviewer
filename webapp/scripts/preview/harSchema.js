@@ -265,6 +265,7 @@ var timingsType = {
             "receive": {"type": "number", "min": -1},
             "ssl": {"type": "number", "optional": true, "min": -1},
             "dataArrivals": {"type": "array", "optional": true, "items": {"$ref": "dataEntryType"}},
+            "reset": {"type": "array", "optional": true, "items": {"type": "number"}},
             "comment": {"type": "string", "optional": true}
         }
     }

@@ -239,6 +239,20 @@
     opacity: 0.1;
 }
 
+
+.netResetBar {
+    position: absolute;
+    left: 0;
+    top: 1;
+    bottom: 0;
+    background: #0066FF;
+    min-width: 0px;
+    z-index: 31;
+    height: 4px;
+    width: 3px;
+    opacity: 0.7;
+}
+
 .fromCache .netReceivingBar,
 .fromCache.netReceivingBar {
     background: url(images/timeline-sprites.png) repeat-x scroll 0 -96px #D6D6D6;

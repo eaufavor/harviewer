@@ -43,7 +43,7 @@ function RequestList(input)
 }
 
 // ********************************************************************************************* //
-// Columns 
+// Columns
 
 /**
  * List of all available columns for the request table, see also RequestList.prototype.tableTag
@@ -121,7 +121,7 @@ RequestList.setVisibleColumns();
 
 /**
  * @domplate This object represents a template for list of entries (requests).
- * This list is displayed when a page is expanded by the user. 
+ * This list is displayed when a page is expanded by the user.
  */
 RequestList.prototype = domplate(
 /** @lends RequestList */
@@ -182,6 +182,9 @@ RequestList.prototype = domplate(
                         DIV({"class": "netReceivingBar netBar"},
                             FOR("data", "$file|getDataArrivals",
                                 DIV({"class": "netDataArrivalBar netBar"})
+                                ),
+                            FOR("data", "$file|getReset",
+                                DIV({"class": "netResetBar netBar"})
                                 ),
                             SPAN({"class": "netTimeLabel"}, "$file|getElapsedTime")
                         )
@@ -297,6 +300,14 @@ RequestList.prototype = domplate(
     {
 		if ( 'undefined' !== typeof file.timings.dataArrivals ) {
 			return file.timings.dataArrivals;
+		}
+        return [];
+    },
+
+    getReset: function(file)
+    {
+		if ( 'undefined' !== typeof file.timings.reset ) {
+			return file.timings.reset;
 		}
         return [];
     },
@@ -613,9 +624,9 @@ RequestList.prototype = domplate(
         var startedDateTime = Lib.parseISO8601(file.startedDateTime);
         this.barOffset = (((startedDateTime-this.phaseStartTime)/this.phaseElapsed) * 100).toFixed(3);
 
-        // Compute size of each bar. Left side of each bar starts at the 
+        // Compute size of each bar. Left side of each bar starts at the
         // beginning. The first bar is on top of all and the last one is
-        // at the bottom (z-index). 
+        // at the bottom (z-index).
         this.barBlockingWidth = ((blocking/this.phaseElapsed) * 100).toFixed(3);
         this.barResolvingWidth = ((resolving/this.phaseElapsed) * 100).toFixed(3);
         this.barConnectingWidth = ((connecting/this.phaseElapsed) * 100).toFixed(3);
@@ -627,6 +638,16 @@ RequestList.prototype = domplate(
         for (var i = 0; i < dataArrivalsLength; i++ ) {
             //relative percentage of the length of barReceiving, as Receiving Bar is the last one
             this.dataArrivalLeft[i] = ((file.timings.dataArrivals[i].timestamp/this.phaseElapsed) *10000 / this.barReceivingWidth ).toFixed(3);
+        }
+
+        this.resetLeft = [];
+        var resetLength = 0
+        if (typeof file.timings.reset !== 'undefined') {
+            resetLength = file.timings.reset.length;
+        }
+        for (var i = 0; i < resetLength; i++ ) {
+            //relative percentage of the length of barReceiving, as Receiving Bar is the last one
+            this.resetLeft[i] = ((file.timings.reset[i]/this.phaseElapsed) *10000 / this.barReceivingWidth ).toFixed(3);
         }
 
         // Compute also offset for page timings, e.g.: contentLoadBar and windowLoadBar,
@@ -663,7 +684,7 @@ RequestList.prototype = domplate(
 
         var phase;
 
-        // Iterate over all existing entries. Some rows aren't associated with a file 
+        // Iterate over all existing entries. Some rows aren't associated with a file
         // (e.g. header, sumarry) so, skip them.
         for (var row = this.firstRow; row; row = row.nextSibling)
         {
@@ -695,16 +716,21 @@ RequestList.prototype = domplate(
             var waitingBar = sendingBar.nextSibling;
             var receivingBar = waitingBar.nextSibling;
             var dataDotDIVs = []
-            var dotLength = this.dataArrivalLeft.length;
-            for ( var i = 0; i < dotLength; i++ ) {
+            var resetDotDIVs = []
+            var dataDotLength = this.dataArrivalLeft.length;
+            var resetDotLength = this.resetLeft.length;
+            for ( var i = 0; i < dataDotLength; i++ ) {
                 dataDotDIVs[i] = receivingBar.children[i];
             }
+            for ( var i = 0; i < resetDotLength; i++ ) {
+                resetDotDIVs[i] = receivingBar.children[i+dataDotLength];
+            }
 
-            // All bars starts at the beginning of the appropriate request graph. 
-            blockingBar.style.left = 
+            // All bars starts at the beginning of the appropriate request graph.
+            blockingBar.style.left =
                 connectingBar.style.left =
                 resolvingBar.style.left =
-                sendingBar.style.left = 
+                sendingBar.style.left =
                 waitingBar.style.left =
                 receivingBar.style.left = this.barOffset + "%";
 
@@ -715,8 +741,11 @@ RequestList.prototype = domplate(
             sendingBar.style.width = this.barSendingWidth + "%";
             waitingBar.style.width = this.barWaitingWidth + "%";
             receivingBar.style.width = this.barReceivingWidth + "%";
-            for ( var i = 0; i < dotLength; i++ ) {
+            for ( var i = 0; i < dataDotLength; i++ ) {
                 dataDotDIVs[i].style.left = this.dataArrivalLeft[i] + "%";
+            }
+            for ( var i = 0; i < resetDotLength; i++ ) {
+                resetDotDIVs[i].style.left = this.resetLeft[i] + "%";
             }
 
             // Remove all existing timing bars first. The UI can be relayouting at this moment
@@ -1174,6 +1203,7 @@ var EntryTimeInfoTip = domplate(
         var wait = file.timings.wait;
         var receive = file.timings.receive;
         var dataArrivals = file.timings.dataArrivals;
+        var reset = file.timings.reset;
 
         if (blocked >= 0)
         {
@@ -1226,6 +1256,17 @@ var EntryTimeInfoTip = domplate(
                 elapsed: 0,
                 start: dataArrivals[i].timestamp,
                 loaded: dataArrivals[i].timestamp});
+            }
+        }
+
+        if ( 'undefined' !== typeof reset )
+        {
+            var resetLength = reset.length;
+            for ( var i = 0; i < resetLength; i++ ) {
+                timings.push({bar: "request.phase.reset",
+                elapsed: 0,
+                start: reset[i],
+                loaded: reset[i]});
             }
         }
 

@@ -24,6 +24,7 @@ define(
         "request.phase.Waiting": "Waiting",
         "request.phase.Receiving": "Receiving",
         "request.phase.dataArrivals": "Data packet arrival",
+        "request.phase.reset": "h2 stream reset",
 
         "request.timings.label": "Event timing relative to the request start:",
         "ContentLoad": "DOM Loaded",
