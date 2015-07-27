@@ -78,11 +78,11 @@ RequestBody.prototype = domplate(
         if (!file.cache)
             return false;
 
-        if (!file.cache.afterRequest)
+        if (!file.cache.afterRequest && !file.cache.beforeRequest)
             return false;
 
-        // Don't show cache tab for images 
-        // xxxHonza: the tab could display the image. 
+        // Don't show cache tab for images
+        // xxxHonza: the tab could display the image.
         if (file.category == "image")
             return false;
 
@@ -356,12 +356,24 @@ CacheTab.prototype = domplate(HeadersTab.prototype,
 
     onUpdateBody: function(tabView, body)
     {
+        var cacheEntry;
+        var values;
+        var prop
         if (this.file.cache && this.file.cache.afterRequest)
         {
-            var cacheEntry = this.file.cache.afterRequest;
+            cacheEntry = this.file.cache.afterRequest;
 
-            var values = [];
-            for (var prop in cacheEntry)
+            values = [];
+            for (prop in cacheEntry)
+                values.push({name: prop, value: cacheEntry[prop]});
+
+            this.insertHeaderRows(body, values, "Cache");
+        }
+        else if (this.file.cache && this.file.cache.beforeRequest)
+        {
+            cacheEntry = this.file.cache.beforeRequest;
+            values = [];
+            for (prop in cacheEntry)
                 values.push({name: prop, value: cacheEntry[prop]});
 
             this.insertHeaderRows(body, values, "Cache");
@@ -372,7 +384,7 @@ CacheTab.prototype = domplate(HeadersTab.prototype,
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 /**
- * @domplate Represents an HTML preview for network responses using 'text/html' or 
+ * @domplate Represents an HTML preview for network responses using 'text/html' or
  * 'application/xhtml+xml' mime type.
  */
 function HtmlTab(file)
